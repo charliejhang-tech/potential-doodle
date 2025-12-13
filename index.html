@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="獨秀記帳">
+  <title>獨秀記帳</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f7;
+      min-height: 100vh;
+      padding: 20px;
+      padding-top: env(safe-area-inset-top, 20px);
+    }
+    
+    .container { max-width: 400px; margin: 0 auto; }
+    
+    .index-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 24px;
+      color: white;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+    }
+    
+    .index-label { font-size: 14px; opacity: 0.9; }
+    .index-value { font-size: 48px; font-weight: 700; margin: 8px 0; }
+    .index-status { font-size: 14px; opacity: 0.9; }
+    
+    .stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .stat { flex: 1; }
+    .stat-label { font-size: 11px; opacity: 0.8; }
+    .stat-value { font-size: 18px; font-weight: 600; margin-top: 4px; }
+    
+    .input-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .amount-input {
+      width: 100%;
+      font-size: 32px;
+      font-weight: 600;
+      border: none;
+      text-align: center;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .amount-input:focus { outline: none; background: #f0f1f3; }
+    .amount-input::placeholder { color: #adb5bd; }
+    
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .category-btn {
+      padding: 14px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      background: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .category-btn:active { transform: scale(0.98); }
+    .category-btn.selected { border-color: #667eea; background: #f0f1ff; }
+    .category-btn.income { color: #22c55e; }
+    .category-btn.expense { color: #ef4444; }
+    .category-btn.luxury { color: #f59e0b; }
+    
+    .note-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+    
+    .note-input:focus { outline: none; border-color: #667eea; }
+    
+    .save-btn {
+      width: 100%;
+      padding: 16px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .save-btn:active { background: #5a67d8; }
+    .save-btn:disabled { background: #adb5bd; }
+    
+    .history-section { margin-top: 20px; }
+    
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .section-title { font-size: 14px; color: #6b7280; font-weight: 600; }
+    
+    .clear-btn {
+      font-size: 12px;
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .history-list {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .history-item:last-child { border-bottom: none; }
+    
+    .item-left { display: flex; flex-direction: column; gap: 2px; }
+    .item-category { font-size: 13px; font-weight: 500; }
+    .item-note { font-size: 11px; color: #9ca3af; }
+    .item-date { font-size: 11px; color: #9ca3af; }
+    
+    .item-amount { font-size: 16px; font-weight: 600; }
+    .item-amount.income { color: #22c55e; }
+    .item-amount.expense { color: #374151; }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    
+    .tabs {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6b7280;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    
+    .tab.active { background: #667eea; color: white; }
+    
+    .view { display: none; }
+    .view.active { display: block; }
+    
+    .month-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .month-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: white;
+      font-size: 18px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .current-month { font-size: 16px; font-weight: 600; color: #374151; }
+    
+    /* 設定頁面 */
+    .settings-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .settings-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #374151;
+    }
+    
+    .settings-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    
+    .settings-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    
+    .settings-input:focus { outline: none; border-color: #667eea; }
+    
+    .settings-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    
+    .settings-btn.primary { background: #667eea; color: white; }
+    .settings-btn.secondary { background: #f3f4f6; color: #374151; }
+    .settings-btn:disabled { opacity: 0.5; }
+    
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .sync-status.disconnected { background: #fef2f2; }
+    .sync-status.syncing { background: #fffbeb; }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+    
+    .sync-status.disconnected .status-dot { background: #ef4444; }
+    .sync-status.syncing .status-dot { background: #f59e0b; animation: pulse 1s infinite; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .status-text { font-size: 13px; color: #374151; }
+    
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn-group .settings-btn { flex: 1; margin-bottom: 0; }
+    
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #374151;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchView('input')">記帳</button>
+      <button class="tab" onclick="switchView('history')">歷史</button>
+      <button class="tab" onclick="switchView('settings')">設定</button>
+    </div>
+    
+    <!-- 記帳頁面 -->
+    <div id="input-view" class="view active">
+      <div class="index-card">
+        <div class="index-label">本月獨秀指數</div>
+        <div class="index-value" id="duxiu-index">—</div>
+        <div class="index-status" id="index-status">開始記錄你的第一筆</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">勞動收入</div>
+            <div class="stat-value" id="total-income">$0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">維持成本</div>
+            <div class="stat-value" id="total-cost">$0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-section">
+        <input type="number" class="amount-input" id="amount" placeholder="金額" inputmode="numeric">
+        
+        <div class="category-grid">
+          <button class="category-btn income" data-category="勞動收入" onclick="selectCategory(this)">💼 勞動收入</button>
+          <button class="category-btn expense" data-category="維持成本" onclick="selectCategory(this)">🏠 維持成本</button>
+          <button class="category-btn income" data-category="被動收入" onclick="selectCategory(this)">📈 被動收入</button>
+          <button class="category-btn luxury" data-category="奢侈消費" onclick="selectCategory(this)">✨ 奢侈消費</button>
+        </div>
+        
+        <input type="text" class="note-input" id="note" placeholder="備註（選填）">
+        
+        <button class="save-btn" id="save-btn" onclick="saveEntry()" disabled>儲存</button>
+      </div>
+    </div>
+    
+    <!-- 歷史頁面 -->
+    <div id="history-view" class="view">
+      <div class="month-selector">
+        <button class="month-btn" onclick="changeMonth(-1)">←</button>
+        <span class="current-month" id="current-month"></span>
+        <button class="month-btn" onclick="changeMonth(1)">→</button>
+      </div>
+      
+      <div class="index-card">
+        <div class="index-label">當月獨秀指數</div>
+        <div class="index-value" id="history-index">—</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-label">勞動收入</div>
+            <div class="stat-value" id="history-income">$0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">維持成本</div>
+            <div class="stat-value" id="history-cost">$0</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="history-section">
+        <div class="section-header">
+          <span class="section-title">交易記錄</span>
+          <button class="clear-btn" onclick="clearData()">清除全部</button>
+        </div>
+        <div class="history-list" id="history-list">
+          <div class="empty-state">尚無記錄</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 設定頁面 -->
+    <div id="settings-view" class="view">
+      <!-- Google Sheets 同步 -->
+      <div class="settings-card">
+        <div class="settings-title">☁️ Google Sheets 同步</div>
+        <div id="sync-status" class="sync-status disconnected">
+          <div class="status-dot"></div>
+          <span class="status-text">尚未連接</span>
+        </div>
+        <div class="settings-desc">
+          輸入你的 Google Apps Script Web App URL 來啟用跨裝置同步。
+          <a href="#" onclick="showSetupGuide(); return false;" style="color: #667eea;">查看設定教學</a>
+        </div>
+        <input type="text" class="settings-input" id="sheets-url" placeholder="https://script.google.com/macros/s/...">
+        <button class="settings-btn primary" onclick="connectSheets()">連接</button>
+        <div class="btn-group" style="margin-top: 8px;">
+          <button class="settings-btn secondary" onclick="syncToCloud()">上傳到雲端</button>
+          <button class="settings-btn secondary" onclick="syncFromCloud()">從雲端下載</button>
+        </div>
+      </div>
+      
+      <!-- 匯出/匯入 -->
+      <div class="settings-card">
+        <div class="settings-title">📁 匯出 / 匯入</div>
+        <div class="settings-desc">匯出 CSV 檔案備份，或匯入之前的資料。</div>
+        <div class="btn-group">
+          <button class="settings-btn secondary" onclick="exportCSV()">匯出 CSV</button>
+          <button class="settings-btn secondary" onclick="document.getElementById('import-file').click()">匯入 CSV</button>
+        </div>
+        <input type="file" id="import-file" accept=".csv" style="display: none;" onchange="importCSV(event)">
+      </div>
+      
+      <!-- 設定教學 Modal -->
+      <div id="setup-guide" class="settings-card" style="display: none;">
+        <div class="settings-title">📖 Google Sheets 設定教學</div>
+        <div class="settings-desc" style="white-space: pre-line; line-height: 1.8;">
+<strong>步驟 1：建立 Google Sheet</strong>
+建立一個新的 Google Sheet，在第一列加入標題：
+id | date | amount | category | note
+
+<strong>步驟 2：建立 Apps Script</strong>
+1. 在 Google Sheet 中點擊「擴充功能」→「Apps Script」
+2. 刪除所有預設程式碼，貼上下方程式碼
+3. 將 SHEET_ID 改成你的試算表 ID（網址中 /d/ 和 /edit 之間的那串）
+
+<strong>步驟 3：部署</strong>
+1. 點擊「部署」→「新增部署作業」
+2. 類型選「網頁應用程式」
+3. 執行身分：我
+4. 誰可以存取：所有人
+5. 點擊「部署」，複製網址貼到上面的輸入框
+
+<button class="settings-btn secondary" onclick="copyScript()" style="margin-top: 12px;">複製 Apps Script 程式碼</button>
+        </div>
+        <button class="settings-btn secondary" onclick="hideSetupGuide()">關閉教學</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let selectedCategory = null;
+    let viewingDate = new Date();
+    let sheetsUrl = localStorage.getItem('duxiu_sheets_url') || '';
+    
+    // Apps Script 程式碼模板
+    const APPS_SCRIPT_CODE = `const SHEET_ID = '你的試算表ID';
+
+function doGet(e) {
+  return handleRequest(e);
+}
+
+function doPost(e) {
+  return handleRequest(e);
+}
+
+function handleRequest(e) {
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
+  const action = e.parameter.action;
+  
+  if (action === 'get') {
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const rows = data.slice(1).map(row => {
+      const obj = {};
+      headers.forEach((h, i) => obj[h] = row[i]);
+      return obj;
+    });
+    return ContentService.createTextOutput(JSON.stringify(rows))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  if (action === 'add') {
+    const entry = JSON.parse(e.parameter.data);
+    sheet.appendRow([entry.id, entry.date, entry.amount, entry.category, entry.note]);
+    return ContentService.createTextOutput(JSON.stringify({success: true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  if (action === 'sync') {
+    const entries = JSON.parse(e.parameter.data);
+    // 清除舊資料（保留標題）
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.deleteRows(2, lastRow - 1);
+    }
+    // 寫入新資料
+    entries.forEach(entry => {
+      sheet.appendRow([entry.id, entry.date, entry.amount, entry.category, entry.note]);
+    });
+    return ContentService.createTextOutput(JSON.stringify({success: true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify({error: 'Unknown action'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDisplay();
+      updateHistoryView();
+      updateSyncStatus();
+      document.getElementById('amount').addEventListener('input', checkSaveButton);
+      document.getElementById('sheets-url').value = sheetsUrl;
+    });
+    
+    function switchView(view) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', ['input', 'history', 'settings'][i] === view);
+      });
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(view + '-view').classList.add('active');
+      
+      if (view === 'history') {
+        viewingDate = new Date();
+        updateHistoryView();
+      }
+    }
+    
+    function selectCategory(btn) {
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCategory = btn.dataset.category;
+      checkSaveButton();
+    }
+    
+    function checkSaveButton() {
+      const amount = document.getElementById('amount').value;
+      document.getElementById('save-btn').disabled = !amount || !selectedCategory;
+    }
+    
+    async function saveEntry() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const note = document.getElementById('note').value;
+      
+      const entry = {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        amount: amount,
+        category: selectedCategory,
+        note: note
+      };
+      
+      // 存到本地
+      const data = getData();
+      data.push(entry);
+      localStorage.setItem('duxiu_data', JSON.stringify(data));
+      
+      // 同步到雲端
+      if (sheetsUrl) {
+        try {
+          await fetch(`${sheetsUrl}?action=add&data=${encodeURIComponent(JSON.stringify(entry))}`);
+        } catch (e) {
+          console.log('Cloud sync failed:', e);
+        }
+      }
+      
+      // 重置輸入
+      document.getElementById('amount').value = '';
+      document.getElementById('note').value = '';
+      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+      selectedCategory = null;
+      checkSaveButton();
+      updateDisplay();
+      
+      showToast('已儲存 ✓');
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
+    
+    function getData() {
+      return JSON.parse(localStorage.getItem('duxiu_data') || '[]');
+    }
+    
+    function updateDisplay() {
+      const data = getData();
+      const now = new Date();
+      const thisMonth = data.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      });
+      
+      const income = thisMonth.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0);
+      const cost = thisMonth.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0);
+      const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0);
+      
+      document.getElementById('total-income').textContent = '$' + income.toLocaleString();
+      document.getElementById('total-cost').textContent = '$' + cost.toLocaleString();
+      document.getElementById('duxiu-index').textContent = typeof index === 'number' ? index.toFixed(2) : index;
+      
+      let status = '開始記錄你的第一筆';
+      if (thisMonth.length > 0) {
+        if (index >= 2) status = '🎉 舒適區達成！';
+        else if (index >= 1) status = '✨ 經濟獨立！';
+        else if (index > 0) status = '📈 持續努力中';
+        else status = '等待收入記錄';
+      }
+      document.getElementById('index-status').textContent = status;
+    }
+    
+    function changeMonth(delta) {
+      viewingDate.setMonth(viewingDate.getMonth() + delta);
+      updateHistoryView();
+    }
+    
+    function updateHistoryView() {
+      const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+      document.getElementById('current-month').textContent = 
+        viewingDate.getFullYear() + '年 ' + months[viewingDate.getMonth()];
+      
+      const data = getData();
+      const monthData = data.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === viewingDate.getMonth() && d.getFullYear() === viewingDate.getFullYear();
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      const income = monthData.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0);
+      const cost = monthData.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0);
+      const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0);
+      
+      document.getElementById('history-income').textContent = '$' + income.toLocaleString();
+      document.getElementById('history-cost').textContent = '$' + cost.toLocaleString();
+      document.getElementById('history-index').textContent = typeof index === 'number' ? index.toFixed(2) : index;
+      
+      const list = document.getElementById('history-list');
+      if (monthData.length === 0) {
+        list.innerHTML = '<div class="empty-state">本月尚無記錄</div>';
+        return;
+      }
+      
+      list.innerHTML = monthData.map(e => {
+        const d = new Date(e.date);
+        const dateStr = (d.getMonth()+1) + '/' + d.getDate();
+        const isIncome = e.category === '勞動收入' || e.category === '被動收入';
+        const sign = isIncome ? '+' : '-';
+        
+        return `
+          <div class="history-item">
+            <div class="item-left">
+              <span class="item-category">${e.category}</span>
+              ${e.note ? `<span class="item-note">${e.note}</span>` : ''}
+              <span class="item-date">${dateStr}</span>
+            </div>
+            <span class="item-amount ${isIncome ? 'income' : 'expense'}">${sign}$${e.amount.toLocaleString()}</span>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    function clearData() {
+      if (confirm('確定要清除所有記錄嗎？')) {
+        localStorage.removeItem('duxiu_data');
+        updateDisplay();
+        updateHistoryView();
+        showToast('已清除所有記錄');
+      }
+    }
+    
+    // === 同步功能 ===
+    function updateSyncStatus() {
+      const statusEl = document.getElementById('sync-status');
+      if (sheetsUrl) {
+        statusEl.className = 'sync-status';
+        statusEl.querySelector('.status-text').textContent = '已連接 Google Sheets';
+      } else {
+        statusEl.className = 'sync-status disconnected';
+        statusEl.querySelector('.status-text').textContent = '尚未連接';
+      }
+    }
+    
+    function connectSheets() {
+      const url = document.getElementById('sheets-url').value.trim();
+      if (!url) {
+        showToast('請輸入 URL');
+        return;
+      }
+      sheetsUrl = url;
+      localStorage.setItem('duxiu_sheets_url', url);
+      updateSyncStatus();
+      showToast('已連接！');
+    }
+    
+    async function syncToCloud() {
+      if (!sheetsUrl) {
+        showToast('請先連接 Google Sheets');
+        return;
+      }
+      
+      const statusEl = document.getElementById('sync-status');
+      statusEl.className = 'sync-status syncing';
+      statusEl.querySelector('.status-text').textContent = '同步中...';
+      
+      try {
+        const data = getData();
+        await fetch(`${sheetsUrl}?action=sync&data=${encodeURIComponent(JSON.stringify(data))}`);
+        showToast('已上傳到雲端 ✓');
+      } catch (e) {
+        showToast('同步失敗');
+      }
+      
+      updateSyncStatus();
+    }
+    
+    async function syncFromCloud() {
+      if (!sheetsUrl) {
+        showToast('請先連接 Google Sheets');
+        return;
+      }
+      
+      const statusEl = document.getElementById('sync-status');
+      statusEl.className = 'sync-status syncing';
+      statusEl.querySelector('.status-text').textContent = '下載中...';
+      
+      try {
+        const response = await fetch(`${sheetsUrl}?action=get`);
+        const cloudData = await response.json();
+        
+        // 轉換資料格式
+        const entries = cloudData.map(row => ({
+          id: row.id,
+          date: row.date,
+          amount: parseFloat(row.amount),
+          category: row.category,
+          note: row.note || ''
+        })).filter(e => e.id && e.amount);
+        
+        localStorage.setItem('duxiu_data', JSON.stringify(entries));
+        updateDisplay();
+        updateHistoryView();
+        showToast(`已下載 ${entries.length} 筆記錄 ✓`);
+      } catch (e) {
+        showToast('下載失敗');
+      }
+      
+      updateSyncStatus();
+    }
+    
+    // === 匯出/匯入 ===
+    function exportCSV() {
+      const data = getData();
+      if (data.length === 0) {
+        showToast('沒有資料可匯出');
+        return;
+      }
+      
+      const headers = ['日期', '類別', '金額', '備註'];
+      const rows = data.map(e => {
+        const d = new Date(e.date);
+        const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+        return [dateStr, e.category, e.amount, e.note || ''].join(',');
+      });
+      
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `獨秀記帳_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      
+      showToast('已匯出 CSV');
+    }
+    
+    function importCSV(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').slice(1); // 跳過標題
+        
+        const entries = lines.map(line => {
+          const [date, category, amount, note] = line.split(',');
+          if (!date || !amount) return null;
+          
+          return {
+            id: Date.now() + Math.random(),
+            date: new Date(date).toISOString(),
+            amount: parseFloat(amount),
+            category: category || '維持成本',
+            note: note || ''
+          };
+        }).filter(Boolean);
+        
+        const existing = getData();
+        localStorage.setItem('duxiu_data', JSON.stringify([...existing, ...entries]));
+        
+        updateDisplay();
+        updateHistoryView();
+        showToast(`已匯入 ${entries.length} 筆記錄`);
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+    
+    // === 教學 ===
+    function showSetupGuide() {
+      document.getElementById('setup-guide').style.display = 'block';
+    }
+    
+    function hideSetupGuide() {
+      document.getElementById('setup-guide').style.display = 'none';
+    }
+    
+    function copyScript() {
+      navigator.clipboard.writeText(APPS_SCRIPT_CODE);
+      showToast('已複製程式碼');
+    }
+    
+    // === Toast ===
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>

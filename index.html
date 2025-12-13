@@ -8,570 +8,299 @@
   <meta name="apple-mobile-web-app-title" content="獨秀記帳">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=Noto+Serif+TC:wght@400;500;600&display=swap" rel="stylesheet">
   <title>獨秀記帳</title>
   <style>
     :root {
-      --dark: #141413;
-      --light: #faf9f5;
-      --mid-gray: #b0aea5;
-      --light-gray: #e8e6dc;
-      --orange: #d97757;
-      --blue: #6a9bcc;
-      --green: #788c5d;
+      --bg-cream: #F5F3EF;
+      --bg-card: #FFFFFF;
+      --terracotta: #C9715F;
+      --text-primary: #1A1A19;
+      --text-secondary: #5C5C5A;
+      --text-muted: #9A9A96;
+      --border: #E8E5E0;
+      --success: #5A8C55;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: 'Noto Sans TC', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--light);
-      color: var(--dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-cream);
+      color: var(--text-primary);
       min-height: 100vh;
-      padding: 20px;
-      padding-top: env(safe-area-inset-top, 20px);
+      padding: 20px 16px;
+      padding-top: max(env(safe-area-inset-top), 20px);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
     
     .container { max-width: 400px; margin: 0 auto; }
     
-    /* 獨秀指數卡片 */
-    .index-card {
-      background: var(--dark);
-      border-radius: 16px;
-      padding: 28px;
-      color: var(--light);
+    .claude-sun { width: 36px; height: 36px; display: inline-block; vertical-align: middle; margin-right: 10px; }
+    
+    .header { display: flex; align-items: center; justify-content: center; margin-bottom: 24px; padding: 8px 0; }
+    
+    .header-title {
+      font-family: 'Newsreader', 'Noto Serif TC', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+    
+    .dashboard-card {
+      background: var(--terracotta);
+      border-radius: 24px;
+      padding: 32px 28px;
       margin-bottom: 20px;
+      text-align: center;
       position: relative;
       overflow: hidden;
     }
     
-    .index-card::before {
+    .dashboard-card::before {
       content: '';
       position: absolute;
-      top: -50%;
-      right: -30%;
-      width: 200px;
-      height: 200px;
-      background: var(--orange);
-      opacity: 0.15;
-      border-radius: 50%;
+      top: 16px;
+      right: 16px;
+      width: 72px;
+      height: 72px;
+      opacity: 0.25;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23FFF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M50 8 C52 18, 48 20, 50 26'/%3E%3Cpath d='M50 74 C48 80, 52 86, 50 92'/%3E%3Cpath d='M8 50 C16 48, 22 52, 26 50'/%3E%3Cpath d='M74 50 C80 52, 86 48, 92 50'/%3E%3Cpath d='M22 22 C28 26, 30 30, 34 34'/%3E%3Cpath d='M66 66 C70 70, 74 72, 78 78'/%3E%3Cpath d='M78 22 C72 28, 70 30, 66 34'/%3E%3Cpath d='M34 66 C30 70, 26 74, 22 78'/%3E%3Ccircle cx='50' cy='50' r='10' fill='%23FFF' stroke='none'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: contain;
     }
     
-    .index-label { 
-      font-size: 13px; 
-      color: var(--mid-gray);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 500;
-    }
+    .index-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.7); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
     
     .index-value { 
-      font-family: 'Poppins', sans-serif;
-      font-size: 56px; 
-      font-weight: 700; 
-      margin: 8px 0;
-      color: var(--light);
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 72px; 
+      font-weight: 400;
+      color: #FFFFFF;
+      line-height: 1;
+      letter-spacing: -0.02em;
     }
     
-    .index-status { 
-      font-size: 14px; 
-      color: var(--orange);
-      font-weight: 500;
-    }
+    .index-status { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 10px; font-weight: 400; }
     
-    .stats {
-      display: flex;
-      gap: 24px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(176, 174, 165, 0.2);
-    }
+    .stats { display: flex; gap: 48px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); justify-content: center; }
+    .stat { text-align: center; }
+    .stat-label { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+    .stat-value { font-family: 'Newsreader', Georgia, serif; font-size: 20px; font-weight: 400; color: #FFFFFF; letter-spacing: -0.01em; }
     
-    .stat { flex: 1; }
-    .stat-label { 
-      font-size: 11px; 
-      color: var(--mid-gray);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .stat-value { 
-      font-family: 'Poppins', sans-serif;
-      font-size: 20px; 
-      font-weight: 600; 
-      margin-top: 4px;
-      color: var(--light);
-    }
-    
-    /* 輸入區塊 */
-    .input-section {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      border: 1px solid var(--light-gray);
-    }
-    
-    .amount-input {
-      width: 100%;
-      font-family: 'Poppins', sans-serif;
-      font-size: 36px;
-      font-weight: 600;
-      border: none;
-      text-align: center;
-      padding: 20px;
-      background: var(--light);
-      border-radius: 12px;
-      margin-bottom: 20px;
-      color: var(--dark);
-    }
-    
-    .amount-input:focus { 
-      outline: none; 
-      box-shadow: 0 0 0 2px var(--orange);
-    }
-    
-    .amount-input::placeholder { color: var(--mid-gray); }
-    
-    .category-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    
-    .category-btn {
-      padding: 16px 12px;
-      border: 2px solid var(--light-gray);
-      border-radius: 12px;
-      background: white;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--dark);
-    }
-    
-    .category-btn:active { transform: scale(0.98); }
-    
-    .category-btn.selected { 
-      border-color: var(--orange); 
-      background: rgba(217, 119, 87, 0.08);
-    }
-    
-    .category-btn.income { color: var(--green); }
-    .category-btn.expense { color: var(--orange); }
-    .category-btn.luxury { color: var(--blue); }
-    
-    .note-input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--light-gray);
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 20px;
-      font-family: inherit;
-      color: var(--dark);
-      background: white;
-    }
-    
-    .note-input:focus { 
-      outline: none; 
-      border-color: var(--orange);
-    }
-    
-    .save-btn {
-      width: 100%;
-      padding: 18px;
-      background: var(--orange);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .save-btn:hover { background: #c56a4d; }
-    .save-btn:active { transform: scale(0.99); }
-    .save-btn:disabled { background: var(--mid-gray); }
-    
-    /* 歷史記錄 */
-    .history-section { margin-top: 20px; }
-    
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    
-    .section-title { 
-      font-size: 13px; 
-      color: var(--mid-gray); 
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .clear-btn {
-      font-size: 12px;
-      color: var(--orange);
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    
-    .history-list {
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--light-gray);
-    }
-    
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--light-gray);
-    }
-    
-    .history-item:last-child { border-bottom: none; }
-    
-    .item-left { display: flex; flex-direction: column; gap: 4px; }
-    .item-category { font-size: 14px; font-weight: 500; color: var(--dark); }
-    .item-note { font-size: 12px; color: var(--mid-gray); }
-    .item-date { font-size: 11px; color: var(--mid-gray); }
-    
-    .item-amount { 
-      font-family: 'Poppins', sans-serif;
-      font-size: 16px; 
-      font-weight: 600; 
-    }
-    .item-amount.income { color: var(--green); }
-    .item-amount.expense { color: var(--dark); }
-    
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--mid-gray);
-      font-size: 14px;
-    }
-    
-    /* 頁籤 */
-    .tabs {
-      display: flex;
-      background: white;
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 20px;
-      border: 1px solid var(--light-gray);
-    }
-    
-    .tab {
-      flex: 1;
-      padding: 12px;
-      text-align: center;
-      border: none;
-      background: none;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--mid-gray);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .tab.active { 
-      background: var(--dark); 
-      color: var(--light);
-    }
+    .tabs { display: flex; justify-content: center; gap: 4px; margin-bottom: 20px; background: var(--bg-card); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+    .tab { flex: 1; padding: 10px 16px; border: none; background: transparent; font-size: 14px; font-weight: 500; color: var(--text-muted); border-radius: 8px; cursor: pointer; transition: all 0.15s ease; font-family: inherit; }
+    .tab:hover { color: var(--text-secondary); }
+    .tab.active { background: var(--text-primary); color: #FFFFFF; }
     
     .view { display: none; }
     .view.active { display: block; }
     
-    /* 月份選擇 */
-    .month-selector {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
+    .input-card { background: var(--bg-card); border-radius: 20px; padding: 24px; border: 1px solid var(--border); }
     
-    .month-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: 1px solid var(--light-gray);
-      background: white;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--dark);
-      transition: all 0.2s;
-    }
+    .amount-wrapper { background: var(--bg-cream); border-radius: 16px; padding: 24px 20px; margin-bottom: 20px; text-align: center; }
+    .amount-label { font-size: 10px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .amount-input { width: 100%; font-family: 'Newsreader', Georgia, serif; font-size: 48px; font-weight: 400; border: none; text-align: center; padding: 0; background: transparent; color: var(--text-primary); letter-spacing: -0.02em; }
+    .amount-input:focus { outline: none; }
+    .amount-input::placeholder { color: var(--text-muted); }
     
-    .month-btn:hover { border-color: var(--orange); }
+    .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .category-btn { padding: 16px 12px; border: 1.5px solid var(--border); border-radius: 14px; background: var(--bg-card); cursor: pointer; transition: all 0.15s ease; text-align: center; font-family: inherit; }
+    .category-btn:hover { border-color: var(--text-muted); }
+    .category-btn:active { transform: scale(0.98); }
+    .category-btn.selected { border-color: var(--terracotta); background: rgba(201, 113, 95, 0.05); }
+    .category-btn .icon { width: 32px; height: 32px; margin: 0 auto 8px; display: block; }
+    .category-btn .label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
     
-    .current-month { 
-      font-size: 16px; 
-      font-weight: 600; 
-      color: var(--dark);
-    }
+    .note-input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; margin-bottom: 16px; font-family: inherit; color: var(--text-primary); background: var(--bg-card); }
+    .note-input:focus { outline: none; border-color: var(--terracotta); }
+    .note-input::placeholder { color: var(--text-muted); }
     
-    /* 設定頁面 */
-    .settings-card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 16px;
-      border: 1px solid var(--light-gray);
-    }
+    .save-btn { width: 100%; padding: 16px; background: var(--text-primary); color: #FFFFFF; border: none; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.15s ease; font-family: inherit; }
+    .save-btn:hover { opacity: 0.9; }
+    .save-btn:active { transform: scale(0.99); }
+    .save-btn:disabled { background: var(--border); color: var(--text-muted); }
     
-    .settings-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--dark);
-    }
+    .month-selector { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px; }
+    .month-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg-card); font-size: 18px; cursor: pointer; color: var(--text-primary); transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; }
+    .month-btn:hover { border-color: var(--text-muted); }
+    .current-month { font-family: 'Newsreader', 'Noto Serif TC', Georgia, serif; font-size: 18px; font-weight: 400; color: var(--text-primary); min-width: 130px; text-align: center; }
     
-    .settings-desc {
-      font-size: 13px;
-      color: var(--mid-gray);
-      margin-bottom: 16px;
-      line-height: 1.6;
-    }
+    .history-section { margin-top: 20px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 4px; }
+    .section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .clear-btn { font-size: 13px; color: var(--terracotta); background: none; border: none; cursor: pointer; font-weight: 500; font-family: inherit; }
     
-    .settings-input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid var(--light-gray);
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 12px;
-      font-family: inherit;
-    }
+    .history-list { background: var(--bg-card); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .history-item:last-child { border-bottom: none; }
+    .item-left { display: flex; flex-direction: column; gap: 2px; }
+    .item-category { font-size: 15px; font-weight: 500; color: var(--text-primary); }
+    .item-note { font-size: 13px; color: var(--text-muted); }
+    .item-date { font-size: 12px; color: var(--text-muted); }
+    .item-amount { font-family: 'Newsreader', Georgia, serif; font-size: 18px; font-weight: 400; }
+    .item-amount.income { color: var(--success); }
+    .item-amount.expense { color: var(--text-primary); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; }
     
-    .settings-input:focus { 
-      outline: none; 
-      border-color: var(--orange);
-    }
-    
-    .settings-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: all 0.2s;
-    }
-    
-    .settings-btn.primary { 
-      background: var(--orange); 
-      color: white;
-    }
-    
-    .settings-btn.primary:hover { background: #c56a4d; }
-    
-    .settings-btn.secondary { 
-      background: var(--light-gray); 
-      color: var(--dark);
-    }
-    
-    .settings-btn.secondary:hover { background: #dddbd1; }
-    
-    .settings-btn:disabled { opacity: 0.5; }
-    
-    .sync-status {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px;
-      background: rgba(120, 140, 93, 0.1);
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .sync-status.disconnected { background: rgba(217, 119, 87, 0.1); }
-    .sync-status.syncing { background: rgba(106, 155, 204, 0.1); }
-    
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-    
-    .sync-status.disconnected .status-dot { background: var(--orange); }
-    .sync-status.syncing .status-dot { 
-      background: var(--blue); 
-      animation: pulse 1s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    .status-text { font-size: 13px; color: var(--dark); font-weight: 500; }
-    
-    .btn-group {
-      display: flex;
-      gap: 10px;
-    }
-    
+    .settings-card { background: var(--bg-card); border-radius: 16px; padding: 22px; margin-bottom: 14px; border: 1px solid var(--border); }
+    .settings-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .settings-icon { width: 24px; height: 24px; }
+    .settings-title { font-family: 'Newsreader', 'Noto Serif TC', Georgia, serif; font-size: 17px; font-weight: 500; color: var(--text-primary); }
+    .settings-desc { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.55; }
+    .settings-desc a { color: var(--terracotta); text-decoration: none; }
+    .settings-desc a:hover { text-decoration: underline; }
+    .settings-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; margin-bottom: 12px; font-family: inherit; color: var(--text-primary); }
+    .settings-input:focus { outline: none; border-color: var(--terracotta); }
+    .settings-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: all 0.15s ease; font-family: inherit; }
+    .settings-btn.primary { background: var(--text-primary); color: #FFFFFF; }
+    .settings-btn.primary:hover { opacity: 0.9; }
+    .settings-btn.secondary { background: var(--bg-cream); color: var(--text-primary); border: 1px solid var(--border); }
+    .settings-btn.secondary:hover { background: #EDE9E3; }
+    .sync-status { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--bg-cream); border-radius: 10px; margin-bottom: 14px; }
+    .sync-status.connected { background: rgba(90, 140, 85, 0.1); }
+    .sync-status.syncing { background: rgba(201, 113, 95, 0.1); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+    .sync-status.connected .status-dot { background: var(--success); }
+    .sync-status.syncing .status-dot { background: var(--terracotta); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .status-text { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+    .btn-group { display: flex; gap: 8px; }
     .btn-group .settings-btn { flex: 1; margin-bottom: 0; }
-    
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--dark);
-      color: var(--light);
-      padding: 14px 28px;
-      border-radius: 100px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      transition: opacity 0.3s;
-      z-index: 1000;
-    }
-    
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: #FFFFFF; padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s ease; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
     .toast.show { opacity: 1; }
-    
-    a { color: var(--orange); }
+    #setup-guide .settings-desc { white-space: pre-line; line-height: 1.8; }
+    #setup-guide strong { color: var(--text-primary); }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="header">
+      <svg class="claude-sun" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="#C9715F" stroke-width="4" stroke-linecap="round">
+          <path d="M50 8 C52 18, 48 20, 50 26"/>
+          <path d="M50 74 C48 80, 52 86, 50 92"/>
+          <path d="M8 50 C16 48, 22 52, 26 50"/>
+          <path d="M74 50 C80 52, 86 48, 92 50"/>
+          <path d="M22 22 C28 26, 30 30, 34 34"/>
+          <path d="M66 66 C70 70, 74 72, 78 78"/>
+          <path d="M78 22 C72 28, 70 30, 66 34"/>
+          <path d="M34 66 C30 70, 26 74, 22 78"/>
+          <circle cx="50" cy="50" r="12" fill="#C9715F" stroke="none"/>
+        </g>
+      </svg>
+      <h1 class="header-title">獨秀記帳</h1>
+    </div>
+    
     <div class="tabs">
       <button class="tab active" onclick="switchView('input')">記帳</button>
       <button class="tab" onclick="switchView('history')">歷史</button>
       <button class="tab" onclick="switchView('settings')">設定</button>
     </div>
     
-    <!-- 記帳頁面 -->
     <div id="input-view" class="view active">
-      <div class="index-card">
+      <div class="dashboard-card">
         <div class="index-label">本月獨秀指數</div>
         <div class="index-value" id="duxiu-index">—</div>
         <div class="index-status" id="index-status">開始記錄你的第一筆</div>
         <div class="stats">
-          <div class="stat">
-            <div class="stat-label">勞動收入</div>
-            <div class="stat-value" id="total-income">$0</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">維持成本</div>
-            <div class="stat-value" id="total-cost">$0</div>
-          </div>
+          <div class="stat"><div class="stat-label">勞動收入</div><div class="stat-value" id="total-income">$0</div></div>
+          <div class="stat"><div class="stat-label">維持成本</div><div class="stat-value" id="total-cost">$0</div></div>
         </div>
       </div>
       
-      <div class="input-section">
-        <input type="number" class="amount-input" id="amount" placeholder="0" inputmode="numeric">
+      <div class="input-card">
+        <div class="amount-wrapper">
+          <div class="amount-label">輸入金額</div>
+          <input type="number" class="amount-input" id="amount" placeholder="0" inputmode="numeric">
+        </div>
         
         <div class="category-grid">
-          <button class="category-btn income" data-category="勞動收入" onclick="selectCategory(this)">💼 勞動收入</button>
-          <button class="category-btn expense" data-category="維持成本" onclick="selectCategory(this)">🏠 維持成本</button>
-          <button class="category-btn income" data-category="被動收入" onclick="selectCategory(this)">📈 被動收入</button>
-          <button class="category-btn luxury" data-category="奢侈消費" onclick="selectCategory(this)">✨ 奢侈消費</button>
+          <button class="category-btn" data-category="勞動收入" onclick="selectCategory(this)">
+            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M10 38 C14 34, 18 34, 24 34 C30 34, 34 34, 38 38"/><path d="M24 28 C18 28, 14 24, 14 18 C14 12, 18 8, 24 8 C30 8, 34 12, 34 18 C34 24, 30 28, 24 28"/><path d="M20 17 C21 16, 27 16, 28 17"/><path d="M20 21 C22 22, 26 22, 28 21"/></svg>
+            <span class="label">勞動收入</span>
+          </button>
+          <button class="category-btn" data-category="維持成本" onclick="selectCategory(this)">
+            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M10 40 L10 22 C10 20, 12 18, 14 18 L24 10 L34 18 C36 18, 38 20, 38 22 L38 40"/><path d="M10 40 L38 40"/><path d="M20 40 L20 30 C20 28, 22 28, 24 28 C26 28, 28 28, 28 30 L28 40"/></svg>
+            <span class="label">維持成本</span>
+          </button>
+          <button class="category-btn" data-category="被動收入" onclick="selectCategory(this)">
+            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M10 34 C14 30, 18 32, 22 28 C26 24, 30 18, 38 14"/><path d="M30 14 L38 14 L38 22"/><circle cx="14" cy="32" r="3"/><circle cx="26" cy="24" r="3"/></svg>
+            <span class="label">被動收入</span>
+          </button>
+          <button class="category-btn" data-category="奢侈消費" onclick="selectCategory(this)">
+            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M24 8 L26 16 L34 18 L28 24 L30 32 L24 28 L18 32 L20 24 L14 18 L22 16 Z"/><path d="M12 38 C16 36, 20 40, 24 38 C28 36, 32 40, 36 38"/></svg>
+            <span class="label">奢侈消費</span>
+          </button>
         </div>
         
         <input type="text" class="note-input" id="note" placeholder="備註（選填）">
-        
         <button class="save-btn" id="save-btn" onclick="saveEntry()" disabled>儲存</button>
       </div>
     </div>
     
-    <!-- 歷史頁面 -->
     <div id="history-view" class="view">
       <div class="month-selector">
         <button class="month-btn" onclick="changeMonth(-1)">←</button>
         <span class="current-month" id="current-month"></span>
         <button class="month-btn" onclick="changeMonth(1)">→</button>
       </div>
-      
-      <div class="index-card">
+      <div class="dashboard-card">
         <div class="index-label">當月獨秀指數</div>
         <div class="index-value" id="history-index">—</div>
         <div class="stats">
-          <div class="stat">
-            <div class="stat-label">勞動收入</div>
-            <div class="stat-value" id="history-income">$0</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">維持成本</div>
-            <div class="stat-value" id="history-cost">$0</div>
-          </div>
+          <div class="stat"><div class="stat-label">勞動收入</div><div class="stat-value" id="history-income">$0</div></div>
+          <div class="stat"><div class="stat-label">維持成本</div><div class="stat-value" id="history-cost">$0</div></div>
         </div>
       </div>
-      
       <div class="history-section">
-        <div class="section-header">
-          <span class="section-title">交易記錄</span>
-          <button class="clear-btn" onclick="clearData()">清除全部</button>
-        </div>
-        <div class="history-list" id="history-list">
-          <div class="empty-state">尚無記錄</div>
-        </div>
+        <div class="section-header"><span class="section-title">交易記錄</span><button class="clear-btn" onclick="clearData()">清除全部</button></div>
+        <div class="history-list" id="history-list"><div class="empty-state">尚無記錄</div></div>
       </div>
     </div>
     
-    <!-- 設定頁面 -->
     <div id="settings-view" class="view">
       <div class="settings-card">
-        <div class="settings-title">☁️ Google Sheets 同步</div>
-        <div id="sync-status" class="sync-status disconnected">
-          <div class="status-dot"></div>
-          <span class="status-text">尚未連接</span>
+        <div class="settings-header">
+          <svg class="settings-icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M12 12 C16 8, 32 8, 36 12 C40 16, 40 32, 36 36 C32 40, 16 40, 12 36 C8 32, 8 16, 12 12"/><path d="M18 24 C18 20, 30 20, 30 24 C30 28, 18 28, 18 24"/><path d="M24 12 L24 8"/><path d="M24 40 L24 36"/></svg>
+          <span class="settings-title">Google Sheets 同步</span>
         </div>
-        <div class="settings-desc">
-          輸入你的 Google Apps Script Web App URL 來啟用跨裝置同步。
-          <a href="#" onclick="showSetupGuide(); return false;">查看設定教學</a>
-        </div>
+        <div id="sync-status" class="sync-status"><div class="status-dot"></div><span class="status-text">尚未連接</span></div>
+        <div class="settings-desc">輸入你的 Google Apps Script Web App URL 來啟用跨裝置同步。<a href="#" onclick="showSetupGuide(); return false;">查看設定教學</a></div>
         <input type="text" class="settings-input" id="sheets-url" placeholder="https://script.google.com/macros/s/...">
         <button class="settings-btn primary" onclick="connectSheets()">連接</button>
-        <div class="btn-group" style="margin-top: 10px;">
-          <button class="settings-btn secondary" onclick="syncToCloud()">上傳雲端</button>
-          <button class="settings-btn secondary" onclick="syncFromCloud()">下載雲端</button>
-        </div>
+        <div class="btn-group" style="margin-top: 8px;"><button class="settings-btn secondary" onclick="syncToCloud()">上傳雲端</button><button class="settings-btn secondary" onclick="syncFromCloud()">下載雲端</button></div>
       </div>
-      
       <div class="settings-card">
-        <div class="settings-title">📁 匯出 / 匯入</div>
-        <div class="settings-desc">匯出 CSV 檔案備份，或匯入之前的資料。</div>
-        <div class="btn-group">
-          <button class="settings-btn secondary" onclick="exportCSV()">匯出 CSV</button>
-          <button class="settings-btn secondary" onclick="document.getElementById('import-file').click()">匯入 CSV</button>
+        <div class="settings-header">
+          <svg class="settings-icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M8 14 L24 6 L40 14 L40 34 L24 42 L8 34 Z"/><path d="M24 6 L24 42"/><path d="M8 14 L24 22 L40 14"/></svg>
+          <span class="settings-title">匯出 / 匯入</span>
         </div>
+        <div class="settings-desc">匯出 CSV 檔案備份，或匯入之前的資料。</div>
+        <div class="btn-group"><button class="settings-btn secondary" onclick="exportCSV()">匯出 CSV</button><button class="settings-btn secondary" onclick="document.getElementById('import-file').click()">匯入 CSV</button></div>
         <input type="file" id="import-file" accept=".csv" style="display: none;" onchange="importCSV(event)">
       </div>
-      
       <div id="setup-guide" class="settings-card" style="display: none;">
-        <div class="settings-title">📖 Google Sheets 設定教學</div>
-        <div class="settings-desc" style="white-space: pre-line; line-height: 1.8;">
+        <div class="settings-header">
+          <svg class="settings-icon" viewBox="0 0 48 48" fill="none" stroke="#5C5C5A" stroke-width="2" stroke-linecap="round"><path d="M12 8 L36 8 C38 8, 40 10, 40 12 L40 40 L8 40 L8 12 C8 10, 10 8, 12 8"/><path d="M14 16 L34 16"/><path d="M14 24 L28 24"/><path d="M14 32 L24 32"/></svg>
+          <span class="settings-title">Google Sheets 設定教學</span>
+        </div>
+        <div class="settings-desc">
 <strong>步驟 1：建立 Google Sheet</strong>
 建立一個新的 Google Sheet，在第一列加入標題：
 id | date | amount | category | note
 
 <strong>步驟 2：建立 Apps Script</strong>
-1. 在 Google Sheet 中點擊「擴充功能」→「Apps Script」
-2. 刪除所有預設程式碼，貼上下方程式碼
+1. 點擊「擴充功能」→「Apps Script」
+2. 刪除預設程式碼，貼上下方程式碼
 3. 將 SHEET_ID 改成你的試算表 ID
 
 <strong>步驟 3：部署</strong>
 1. 點擊「部署」→「新增部署作業」
 2. 類型選「網頁應用程式」
-3. 執行身分：我
-4. 誰可以存取：所有人
-5. 點擊「部署」，複製網址貼到上面
+3. 執行身分：我 / 誰可以存取：所有人
+4. 點擊「部署」，複製網址
 
 <button class="settings-btn secondary" onclick="copyScript()" style="margin-top: 12px;">複製 Apps Script 程式碼</button>
         </div>
@@ -583,360 +312,53 @@ id | date | amount | category | note
   <div class="toast" id="toast"></div>
 
   <script>
-    let selectedCategory = null;
-    let viewingDate = new Date();
-    let sheetsUrl = localStorage.getItem('duxiu_sheets_url') || '';
-    
+    let selectedCategory = null, viewingDate = new Date(), sheetsUrl = localStorage.getItem('duxiu_sheets_url') || '';
     const APPS_SCRIPT_CODE = `const SHEET_ID = '你的試算表ID';
-
 function doGet(e) { return handleRequest(e); }
 function doPost(e) { return handleRequest(e); }
-
 function handleRequest(e) {
   const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
   const action = e.parameter.action;
-  
   if (action === 'get') {
     const data = sheet.getDataRange().getValues();
     const headers = data[0];
-    const rows = data.slice(1).map(row => {
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = row[i]);
-      return obj;
-    });
+    const rows = data.slice(1).map(row => { const obj = {}; headers.forEach((h, i) => obj[h] = row[i]); return obj; });
     return ContentService.createTextOutput(JSON.stringify(rows)).setMimeType(ContentService.MimeType.JSON);
   }
-  
   if (action === 'add') {
     const entry = JSON.parse(e.parameter.data);
     sheet.appendRow([entry.id, entry.date, entry.amount, entry.category, entry.note]);
     return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
   }
-  
   if (action === 'sync') {
     const entries = JSON.parse(e.parameter.data);
     const lastRow = sheet.getLastRow();
     if (lastRow > 1) sheet.deleteRows(2, lastRow - 1);
-    entries.forEach(entry => {
-      sheet.appendRow([entry.id, entry.date, entry.amount, entry.category, entry.note]);
-    });
+    entries.forEach(entry => { sheet.appendRow([entry.id, entry.date, entry.amount, entry.category, entry.note]); });
     return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
   }
-  
   return ContentService.createTextOutput(JSON.stringify({error: 'Unknown action'})).setMimeType(ContentService.MimeType.JSON);
 }`;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      updateDisplay();
-      updateHistoryView();
-      updateSyncStatus();
-      document.getElementById('amount').addEventListener('input', checkSaveButton);
-      document.getElementById('sheets-url').value = sheetsUrl;
-    });
-    
-    function switchView(view) {
-      document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['input', 'history', 'settings'][i] === view);
-      });
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById(view + '-view').classList.add('active');
-      
-      if (view === 'history') {
-        viewingDate = new Date();
-        updateHistoryView();
-      }
-    }
-    
-    function selectCategory(btn) {
-      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedCategory = btn.dataset.category;
-      checkSaveButton();
-    }
-    
-    function checkSaveButton() {
-      const amount = document.getElementById('amount').value;
-      document.getElementById('save-btn').disabled = !amount || !selectedCategory;
-    }
-    
-    async function saveEntry() {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const note = document.getElementById('note').value;
-      
-      const entry = {
-        id: Date.now(),
-        date: new Date().toISOString(),
-        amount: amount,
-        category: selectedCategory,
-        note: note
-      };
-      
-      const data = getData();
-      data.push(entry);
-      localStorage.setItem('duxiu_data', JSON.stringify(data));
-      
-      if (sheetsUrl) {
-        try {
-          await fetch(`${sheetsUrl}?action=add&data=${encodeURIComponent(JSON.stringify(entry))}`);
-        } catch (e) {
-          console.log('Cloud sync failed:', e);
-        }
-      }
-      
-      document.getElementById('amount').value = '';
-      document.getElementById('note').value = '';
-      document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-      selectedCategory = null;
-      checkSaveButton();
-      updateDisplay();
-      
-      showToast('已儲存 ✓');
-      if (navigator.vibrate) navigator.vibrate(50);
-    }
-    
-    function getData() {
-      return JSON.parse(localStorage.getItem('duxiu_data') || '[]');
-    }
-    
-    function updateDisplay() {
-      const data = getData();
-      const now = new Date();
-      const thisMonth = data.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      });
-      
-      const income = thisMonth.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0);
-      const cost = thisMonth.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0);
-      const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0);
-      
-      document.getElementById('total-income').textContent = '$' + income.toLocaleString();
-      document.getElementById('total-cost').textContent = '$' + cost.toLocaleString();
-      document.getElementById('duxiu-index').textContent = typeof index === 'number' ? index.toFixed(2) : index;
-      
-      let status = '開始記錄你的第一筆';
-      if (thisMonth.length > 0) {
-        if (index >= 2) status = '🎉 舒適區達成！';
-        else if (index >= 1) status = '✨ 經濟獨立！';
-        else if (index > 0) status = '📈 持續努力中';
-        else status = '等待收入記錄';
-      }
-      document.getElementById('index-status').textContent = status;
-    }
-    
-    function changeMonth(delta) {
-      viewingDate.setMonth(viewingDate.getMonth() + delta);
-      updateHistoryView();
-    }
-    
-    function updateHistoryView() {
-      const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-      document.getElementById('current-month').textContent = 
-        viewingDate.getFullYear() + '年 ' + months[viewingDate.getMonth()];
-      
-      const data = getData();
-      const monthData = data.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === viewingDate.getMonth() && d.getFullYear() === viewingDate.getFullYear();
-      }).sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      const income = monthData.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0);
-      const cost = monthData.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0);
-      const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0);
-      
-      document.getElementById('history-income').textContent = '$' + income.toLocaleString();
-      document.getElementById('history-cost').textContent = '$' + cost.toLocaleString();
-      document.getElementById('history-index').textContent = typeof index === 'number' ? index.toFixed(2) : index;
-      
-      const list = document.getElementById('history-list');
-      if (monthData.length === 0) {
-        list.innerHTML = '<div class="empty-state">本月尚無記錄</div>';
-        return;
-      }
-      
-      list.innerHTML = monthData.map(e => {
-        const d = new Date(e.date);
-        const dateStr = (d.getMonth()+1) + '/' + d.getDate();
-        const isIncome = e.category === '勞動收入' || e.category === '被動收入';
-        const sign = isIncome ? '+' : '-';
-        
-        return `
-          <div class="history-item">
-            <div class="item-left">
-              <span class="item-category">${e.category}</span>
-              ${e.note ? `<span class="item-note">${e.note}</span>` : ''}
-              <span class="item-date">${dateStr}</span>
-            </div>
-            <span class="item-amount ${isIncome ? 'income' : 'expense'}">${sign}$${e.amount.toLocaleString()}</span>
-          </div>
-        `;
-      }).join('');
-    }
-    
-    function clearData() {
-      if (confirm('確定要清除所有記錄嗎？')) {
-        localStorage.removeItem('duxiu_data');
-        updateDisplay();
-        updateHistoryView();
-        showToast('已清除所有記錄');
-      }
-    }
-    
-    function updateSyncStatus() {
-      const statusEl = document.getElementById('sync-status');
-      if (sheetsUrl) {
-        statusEl.className = 'sync-status';
-        statusEl.querySelector('.status-text').textContent = '已連接 Google Sheets';
-      } else {
-        statusEl.className = 'sync-status disconnected';
-        statusEl.querySelector('.status-text').textContent = '尚未連接';
-      }
-    }
-    
-    function connectSheets() {
-      const url = document.getElementById('sheets-url').value.trim();
-      if (!url) {
-        showToast('請輸入 URL');
-        return;
-      }
-      sheetsUrl = url;
-      localStorage.setItem('duxiu_sheets_url', url);
-      updateSyncStatus();
-      showToast('已連接！');
-    }
-    
-    async function syncToCloud() {
-      if (!sheetsUrl) {
-        showToast('請先連接 Google Sheets');
-        return;
-      }
-      
-      const statusEl = document.getElementById('sync-status');
-      statusEl.className = 'sync-status syncing';
-      statusEl.querySelector('.status-text').textContent = '同步中...';
-      
-      try {
-        const data = getData();
-        await fetch(`${sheetsUrl}?action=sync&data=${encodeURIComponent(JSON.stringify(data))}`);
-        showToast('已上傳到雲端 ✓');
-      } catch (e) {
-        showToast('同步失敗');
-      }
-      
-      updateSyncStatus();
-    }
-    
-    async function syncFromCloud() {
-      if (!sheetsUrl) {
-        showToast('請先連接 Google Sheets');
-        return;
-      }
-      
-      const statusEl = document.getElementById('sync-status');
-      statusEl.className = 'sync-status syncing';
-      statusEl.querySelector('.status-text').textContent = '下載中...';
-      
-      try {
-        const response = await fetch(`${sheetsUrl}?action=get`);
-        const cloudData = await response.json();
-        
-        const entries = cloudData.map(row => ({
-          id: row.id,
-          date: row.date,
-          amount: parseFloat(row.amount),
-          category: row.category,
-          note: row.note || ''
-        })).filter(e => e.id && e.amount);
-        
-        localStorage.setItem('duxiu_data', JSON.stringify(entries));
-        updateDisplay();
-        updateHistoryView();
-        showToast(`已下載 ${entries.length} 筆記錄 ✓`);
-      } catch (e) {
-        showToast('下載失敗');
-      }
-      
-      updateSyncStatus();
-    }
-    
-    function exportCSV() {
-      const data = getData();
-      if (data.length === 0) {
-        showToast('沒有資料可匯出');
-        return;
-      }
-      
-      const headers = ['日期', '類別', '金額', '備註'];
-      const rows = data.map(e => {
-        const d = new Date(e.date);
-        const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
-        return [dateStr, e.category, e.amount, e.note || ''].join(',');
-      });
-      
-      const csv = [headers.join(','), ...rows].join('\n');
-      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `獨秀記帳_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      
-      showToast('已匯出 CSV');
-    }
-    
-    function importCSV(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n').slice(1);
-        
-        const entries = lines.map(line => {
-          const [date, category, amount, note] = line.split(',');
-          if (!date || !amount) return null;
-          
-          return {
-            id: Date.now() + Math.random(),
-            date: new Date(date).toISOString(),
-            amount: parseFloat(amount),
-            category: category || '維持成本',
-            note: note || ''
-          };
-        }).filter(Boolean);
-        
-        const existing = getData();
-        localStorage.setItem('duxiu_data', JSON.stringify([...existing, ...entries]));
-        
-        updateDisplay();
-        updateHistoryView();
-        showToast(`已匯入 ${entries.length} 筆記錄`);
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-    
-    function showSetupGuide() {
-      document.getElementById('setup-guide').style.display = 'block';
-    }
-    
-    function hideSetupGuide() {
-      document.getElementById('setup-guide').style.display = 'none';
-    }
-    
-    function copyScript() {
-      navigator.clipboard.writeText(APPS_SCRIPT_CODE);
-      showToast('已複製程式碼');
-    }
-    
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
-    }
+    document.addEventListener('DOMContentLoaded', () => { updateDisplay(); updateHistoryView(); updateSyncStatus(); document.getElementById('amount').addEventListener('input', checkSaveButton); document.getElementById('sheets-url').value = sheetsUrl; });
+    function switchView(view) { document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['input', 'history', 'settings'][i] === view)); document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(view + '-view').classList.add('active'); if (view === 'history') { viewingDate = new Date(); updateHistoryView(); } }
+    function selectCategory(btn) { document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected')); btn.classList.add('selected'); selectedCategory = btn.dataset.category; checkSaveButton(); }
+    function checkSaveButton() { document.getElementById('save-btn').disabled = !document.getElementById('amount').value || !selectedCategory; }
+    async function saveEntry() { const entry = { id: Date.now(), date: new Date().toISOString(), amount: parseFloat(document.getElementById('amount').value), category: selectedCategory, note: document.getElementById('note').value }; const data = getData(); data.push(entry); localStorage.setItem('duxiu_data', JSON.stringify(data)); if (sheetsUrl) { try { await fetch(`${sheetsUrl}?action=add&data=${encodeURIComponent(JSON.stringify(entry))}`); } catch (e) {} } document.getElementById('amount').value = ''; document.getElementById('note').value = ''; document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected')); selectedCategory = null; checkSaveButton(); updateDisplay(); showToast('已儲存 ✓'); if (navigator.vibrate) navigator.vibrate(50); }
+    function getData() { return JSON.parse(localStorage.getItem('duxiu_data') || '[]'); }
+    function updateDisplay() { const data = getData(); const now = new Date(); const thisMonth = data.filter(e => { const d = new Date(e.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }); const income = thisMonth.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0); const cost = thisMonth.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0); const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0); document.getElementById('total-income').textContent = '$' + income.toLocaleString(); document.getElementById('total-cost').textContent = '$' + cost.toLocaleString(); document.getElementById('duxiu-index').textContent = typeof index === 'number' ? index.toFixed(2) : index; let status = '開始記錄你的第一筆'; if (thisMonth.length > 0) { if (index >= 2) status = '舒適區達成！'; else if (index >= 1) status = '經濟獨立！'; else if (index > 0) status = '持續努力中'; else status = '等待收入記錄'; } document.getElementById('index-status').textContent = status; }
+    function changeMonth(delta) { viewingDate.setMonth(viewingDate.getMonth() + delta); updateHistoryView(); }
+    function updateHistoryView() { const months = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']; document.getElementById('current-month').textContent = viewingDate.getFullYear() + ' ' + months[viewingDate.getMonth()]; const data = getData(); const monthData = data.filter(e => { const d = new Date(e.date); return d.getMonth() === viewingDate.getMonth() && d.getFullYear() === viewingDate.getFullYear(); }).sort((a, b) => new Date(b.date) - new Date(a.date)); const income = monthData.filter(e => e.category === '勞動收入').reduce((sum, e) => sum + e.amount, 0); const cost = monthData.filter(e => e.category === '維持成本').reduce((sum, e) => sum + e.amount, 0); const index = cost > 0 ? (income / cost) : (income > 0 ? '∞' : 0); document.getElementById('history-income').textContent = '$' + income.toLocaleString(); document.getElementById('history-cost').textContent = '$' + cost.toLocaleString(); document.getElementById('history-index').textContent = typeof index === 'number' ? index.toFixed(2) : index; const list = document.getElementById('history-list'); if (monthData.length === 0) { list.innerHTML = '<div class="empty-state">本月尚無記錄</div>'; return; } list.innerHTML = monthData.map(e => { const d = new Date(e.date); const isIncome = e.category === '勞動收入' || e.category === '被動收入'; return `<div class="history-item"><div class="item-left"><span class="item-category">${e.category}</span>${e.note ? `<span class="item-note">${e.note}</span>` : ''}<span class="item-date">${d.getMonth()+1}/${d.getDate()}</span></div><span class="item-amount ${isIncome ? 'income' : 'expense'}">${isIncome ? '+' : '-'}$${e.amount.toLocaleString()}</span></div>`; }).join(''); }
+    function clearData() { if (confirm('確定要清除所有記錄嗎？')) { localStorage.removeItem('duxiu_data'); updateDisplay(); updateHistoryView(); showToast('已清除'); } }
+    function updateSyncStatus() { const el = document.getElementById('sync-status'); el.className = sheetsUrl ? 'sync-status connected' : 'sync-status'; el.querySelector('.status-text').textContent = sheetsUrl ? '已連接 Google Sheets' : '尚未連接'; }
+    function connectSheets() { const url = document.getElementById('sheets-url').value.trim(); if (!url) { showToast('請輸入 URL'); return; } sheetsUrl = url; localStorage.setItem('duxiu_sheets_url', url); updateSyncStatus(); showToast('已連接！'); }
+    async function syncToCloud() { if (!sheetsUrl) { showToast('請先連接'); return; } const el = document.getElementById('sync-status'); el.className = 'sync-status syncing'; el.querySelector('.status-text').textContent = '同步中...'; try { await fetch(`${sheetsUrl}?action=sync&data=${encodeURIComponent(JSON.stringify(getData()))}`); showToast('已上傳 ✓'); } catch (e) { showToast('失敗'); } updateSyncStatus(); }
+    async function syncFromCloud() { if (!sheetsUrl) { showToast('請先連接'); return; } const el = document.getElementById('sync-status'); el.className = 'sync-status syncing'; el.querySelector('.status-text').textContent = '下載中...'; try { const res = await fetch(`${sheetsUrl}?action=get`); const cloudData = await res.json(); const entries = cloudData.map(r => ({ id: r.id, date: r.date, amount: parseFloat(r.amount), category: r.category, note: r.note || '' })).filter(e => e.id && e.amount); localStorage.setItem('duxiu_data', JSON.stringify(entries)); updateDisplay(); updateHistoryView(); showToast(`已下載 ${entries.length} 筆 ✓`); } catch (e) { showToast('失敗'); } updateSyncStatus(); }
+    function exportCSV() { const data = getData(); if (!data.length) { showToast('沒有資料'); return; } const csv = ['日期,類別,金額,備註', ...data.map(e => { const d = new Date(e.date); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()},${e.category},${e.amount},${e.note||''}`; })].join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })); a.download = `獨秀記帳_${new Date().toISOString().slice(0,10)}.csv`; a.click(); showToast('已匯出'); }
+    function importCSV(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { const entries = e.target.result.split('\n').slice(1).map(line => { const [date, category, amount, note] = line.split(','); return date && amount ? { id: Date.now() + Math.random(), date: new Date(date).toISOString(), amount: parseFloat(amount), category: category || '維持成本', note: note || '' } : null; }).filter(Boolean); localStorage.setItem('duxiu_data', JSON.stringify([...getData(), ...entries])); updateDisplay(); updateHistoryView(); showToast(`已匯入 ${entries.length} 筆`); }; reader.readAsText(file); event.target.value = ''; }
+    function showSetupGuide() { document.getElementById('setup-guide').style.display = 'block'; }
+    function hideSetupGuide() { document.getElementById('setup-guide').style.display = 'none'; }
+    function copyScript() { navigator.clipboard.writeText(APPS_SCRIPT_CODE); showToast('已複製'); }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
   </script>
 </body>
 </html>

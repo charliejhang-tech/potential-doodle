@@ -1,4 +1,4 @@
-"""Query Amadeus for flight prices, log history, alert on threshold."""
+"""Track flight prices via SerpAPI Google Flights, log history, alert on threshold."""
 
 from __future__ import annotations
 
@@ -11,56 +11,52 @@ from pathlib import Path
 import requests
 import yaml
 
-AMADEUS_BASE = os.environ.get("AMADEUS_BASE", "https://api.amadeus.com")
+SERPAPI_BASE = "https://serpapi.com/search"
 CONFIG_PATH = Path("config.yml")
 HISTORY_PATH = Path("history.json")
 ALERT_LABEL = "flight-alert"
 
 
-def get_token(key: str, secret: str) -> str:
-    r = requests.post(
-        f"{AMADEUS_BASE}/v1/security/oauth2/token",
-        data={
-            "grant_type": "client_credentials",
-            "client_id": key,
-            "client_secret": secret,
-        },
-        timeout=30,
-    )
-    r.raise_for_status()
-    return r.json()["access_token"]
-
-
-def search_flights(token: str, route: dict) -> list[dict]:
+def search_flights(api_key: str, route: dict) -> dict:
     params = {
-        "originLocationCode": route["origin"],
-        "destinationLocationCode": route["destination"],
-        "departureDate": route["depart_date"],
+        "engine": "google_flights",
+        "api_key": api_key,
+        "departure_id": route["origin"],
+        "arrival_id": route["destination"],
+        "outbound_date": route["depart_date"],
+        "currency": route.get("currency", "TWD"),
+        "hl": "zh-tw",
         "adults": route.get("adults", 1),
-        "currencyCode": route.get("currency", "TWD"),
-        "max": 20,
     }
     if route.get("return_date"):
-        params["returnDate"] = route["return_date"]
+        params["return_date"] = route["return_date"]
+        params["type"] = 1  # round trip
+    else:
+        params["type"] = 2  # one way
     if route.get("non_stop", True):
-        params["nonStop"] = "true"
-    if route.get("airline"):
-        params["includedAirlineCodes"] = route["airline"]
+        params["stops"] = 1  # non-stop only
 
-    r = requests.get(
-        f"{AMADEUS_BASE}/v2/shopping/flight-offers",
-        headers={"Authorization": f"Bearer {token}"},
-        params=params,
-        timeout=60,
-    )
+    r = requests.get(SERPAPI_BASE, params=params, timeout=60)
     r.raise_for_status()
-    return r.json().get("data", [])
+    return r.json()
 
 
-def lowest_price(offers: list[dict]) -> float | None:
-    if not offers:
-        return None
-    return min(float(o["price"]["grandTotal"]) for o in offers)
+def lowest_price(payload: dict, airline_code: str | None) -> float | None:
+    candidates = (payload.get("best_flights") or []) + (payload.get("other_flights") or [])
+    prices: list[float] = []
+    for offer in candidates:
+        price = offer.get("price")
+        if price is None:
+            continue
+        if airline_code:
+            airlines = {seg.get("airline_code") for seg in (offer.get("flights") or [])}
+            if airline_code not in airlines:
+                continue
+        prices.append(float(price))
+    if prices:
+        return min(prices)
+    insights_low = (payload.get("price_insights") or {}).get("lowest_price")
+    return float(insights_low) if insights_low is not None else None
 
 
 def append_history(route_name: str, price: float, currency: str) -> None:
@@ -130,12 +126,10 @@ def main() -> int:
         print("config.yml has no routes")
         return 1
 
-    key = os.environ.get("AMADEUS_KEY")
-    secret = os.environ.get("AMADEUS_SECRET")
-    if not key or not secret:
-        print("AMADEUS_KEY / AMADEUS_SECRET env vars are required")
+    api_key = os.environ.get("SERPAPI_KEY")
+    if not api_key:
+        print("SERPAPI_KEY env var is required")
         return 1
-    token = get_token(key, secret)
 
     gh_token = os.environ.get("GITHUB_TOKEN")
     gh_repo = os.environ.get("GITHUB_REPOSITORY")
@@ -145,13 +139,18 @@ def main() -> int:
         name = route["name"]
         print(f"== {name} ==", flush=True)
         try:
-            offers = search_flights(token, route)
+            payload = search_flights(api_key, route)
         except requests.HTTPError as e:
             print(f"  API error: {e.response.status_code} {e.response.text[:200]}", flush=True)
             failures += 1
             continue
 
-        price = lowest_price(offers)
+        if payload.get("error"):
+            print(f"  SerpAPI error: {payload['error']}", flush=True)
+            failures += 1
+            continue
+
+        price = lowest_price(payload, route.get("airline"))
         if price is None:
             print("  no offers returned", flush=True)
             continue

@@ -1,0 +1,26 @@
+# 機票追蹤設定
+# 想加新航線就在 routes 下面複製一段
+#
+# 欄位說明：
+#   name          顯示用的名字 (任意字串)
+#   origin        出發機場 IATA 代碼 (TPE = 桃園)
+#   destination   目的機場 IATA 代碼 (BKK = 曼谷蘇凡納布)
+#   depart_date   去程日期 YYYY-MM-DD
+#   return_date   回程日期 (單程的話刪掉這行)
+#   adults        人數
+#   currency      幣別 (TWD = 新台幣)
+#   non_stop      true = 只看直達
+#   airline       航空公司 IATA 代碼 (JX = 星宇)；要看所有航空就把這行刪掉或註解掉
+#   threshold     跌到這個價 (含稅總價) 以下就開 issue 通知你
+
+routes:
+  - name: "TPE↔BKK 10/3-10/11"
+    origin: TPE
+    destination: BKK
+    depart_date: "2026-10-03"
+    return_date: "2026-10-11"
+    adults: 1
+    currency: TWD
+    non_stop: true
+    # airline: JX        # 取消註解可只看星宇
+    threshold: 11000     # 目前最低 $12,743；跌到 11000 以下就通知

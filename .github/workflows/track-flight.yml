@@ -1,0 +1,42 @@
+name: Track flight prices
+
+on:
+  schedule:
+    # 每天 01:00 UTC = 台北早上 09:00
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - run: python tracker.py
+        env:
+          AMADEUS_KEY: ${{ secrets.AMADEUS_KEY }}
+          AMADEUS_SECRET: ${{ secrets.AMADEUS_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit price history
+        run: |
+          if [[ -n "$(git status --porcelain history.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add history.json
+            git commit -m "Update price history"
+            git push
+          else
+            echo "No history changes to commit"
+          fi

@@ -1,22 +1,22 @@
 # 機票追蹤器
 
-每天自動查 Amadeus 票價，跌破門檻就在 GitHub 開 issue（GitHub 會自動寄信給你）。所有歷史價格存在 `history.json`，可以畫線圖看趨勢。
+每天自動查 Google Flights 票價（透過 SerpAPI），跌破門檻就在 GitHub 開 issue（GitHub 會自動寄信給你）。所有歷史價格存在 `history.json`，可以畫線圖看趨勢。
 
-## 一次性設定（約 10 分鐘）
+## 一次性設定（約 5 分鐘）
 
-### 1. 申請 Amadeus API key
-1. 到 https://developers.amadeus.com 註冊
-2. 進 **My Self-Service Workspace** → **Create new app**
-3. 拿到 **API Key** 和 **API Secret**
-4. 預設用的是 production endpoint（免費 2000 次/月）。新申請的 app 通常會先給 test 環境，要切到 production 看 [這篇](https://developers.amadeus.com/get-started/move-to-production-697)。想先用 test 跑通的話，到 repo Settings 加一個 secret `AMADEUS_BASE` = `https://test.api.amadeus.com`。
+### 1. 申請 SerpAPI key
+1. 到 https://serpapi.com/users/sign_up 註冊（email + 密碼，跟註冊一般網站一樣）
+2. 收信點驗證連結
+3. 登入後，dashboard 首頁就會顯示 **Your Private API Key**，複製下來
+
+免費方案 100 次/月，我們每天 1 次 × 1 條航線 = 30 次/月，剛好。
 
 ### 2. 把 key 放進 GitHub Secrets
 repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**
 
 | Name | Value |
 |---|---|
-| `AMADEUS_KEY` | 你的 API Key |
-| `AMADEUS_SECRET` | 你的 API Secret |
+| `SERPAPI_KEY` | 你的 SerpAPI key |
 
 `GITHUB_TOKEN` 不用自己設，GitHub Actions 會自動給。
 
@@ -45,6 +45,6 @@ repo → **Actions** → **Track flight prices** → **Run workflow**
 
 ## 注意事項
 
-- Amadeus 的價格是 LCC 之外的 GDS 行情，跟 Google Flights 看到的可能差幾百塊（Google 整合了 OTA），但走勢一致
+- 價格直接抓 Google Flights，跟你在瀏覽器看到的一樣（含 OTA 行情）
 - 跌破門檻時，同一條航線只會開一個 issue。關掉 issue 後，下次再跌破才會再開
-- 免費 tier 2000 次/月，每天 1 次 × 1 條航線 = 30 次/月，超夠
+- 免費 100 次/月。每天 1 次 × 1 條航線 = 30 次/月，可以放心。如果加到 3 條航線就會逼近上限，要再加就升級或減頻率

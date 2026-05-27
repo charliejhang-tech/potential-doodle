@@ -4,5 +4,11 @@
     "checked_at": "2026-05-27T13:34:01+00:00",
     "price": 12285.0,
     "currency": "TWD"
+  },
+  {
+    "route": "TPE↔BKK 10/3-10/11",
+    "checked_at": "2026-05-27T15:23:27+00:00",
+    "price": 12285.0,
+    "currency": "TWD"
   }
 ]

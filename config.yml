@@ -23,4 +23,4 @@ routes:
     currency: TWD
     non_stop: true
     # airline: JX        # 取消註解可只看星宇
-    threshold: 13000     # TEMPORARY: bumped from 11000 to force-trigger an alert for notification testing — revert after test
+    threshold: 11000     # 目前最低約 $12,283；跌到 11000 以下就通知

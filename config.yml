@@ -15,7 +15,8 @@
 #   watch_threshold 跌到這個價以下開「留意」issue (沒到 threshold 那麼急) (可省略)
 
 routes:
-  - name: "TPE↔BKK 10/3-10/11"
+  # 主追蹤：所有航空直飛裡的最便宜
+  - name: "TPE↔BKK 10/3-10/11 全航空"
     origin: TPE
     destination: BKK
     depart_date: "2026-10-03"
@@ -23,6 +24,19 @@ routes:
     adults: 1
     currency: TWD
     non_stop: true
-    # airline: JX        # 取消註解可只看星宇
     threshold: 11000          # 跌破就「警報」(BUY)
     watch_threshold: 12000    # 跌破就「留意」(heads up)
+
+  # 同日期但只看星宇直飛 (JX 741/742 早班為主)
+  # 目前約 $12,805；星宇本身比較少破萬，門檻設保守一點
+  - name: "TPE↔BKK 10/3-10/11 星宇"
+    origin: TPE
+    destination: BKK
+    depart_date: "2026-10-03"
+    return_date: "2026-10-11"
+    adults: 1
+    currency: TWD
+    non_stop: true
+    airline: JX
+    threshold: 11500          # 星宇跌到 11500 算撿到便宜
+    watch_threshold: 12500    # 跌到 12500 先留意

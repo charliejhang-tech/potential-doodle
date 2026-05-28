@@ -11,7 +11,8 @@
 #   currency      幣別 (TWD = 新台幣)
 #   non_stop      true = 只看直達
 #   airline       航空公司 IATA 代碼 (JX = 星宇)；要看所有航空就把這行刪掉或註解掉
-#   threshold     跌到這個價 (含稅總價) 以下就開 issue 通知你
+#   threshold     跌到這個價 (含稅總價) 以下就開「警報」issue (買!)
+#   watch_threshold 跌到這個價以下開「留意」issue (沒到 threshold 那麼急) (可省略)
 
 routes:
   - name: "TPE↔BKK 10/3-10/11"
@@ -23,4 +24,5 @@ routes:
     currency: TWD
     non_stop: true
     # airline: JX        # 取消註解可只看星宇
-    threshold: 11000     # 目前最低約 $12,283；跌到 11000 以下就通知
+    threshold: 11000          # 跌破就「警報」(BUY)
+    watch_threshold: 12000    # 跌破就「留意」(heads up)

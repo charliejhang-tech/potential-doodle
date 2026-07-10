@@ -109,9 +109,11 @@ def open_issue_if_new(
         timeout=30,
     )
     existing.raise_for_status()
-    for issue in existing.json():
-        if route["name"] in issue.get("title", ""):
-            return None
+    duplicate_open = any(route["name"] in issue.get("title", "") for issue in existing.json())
+    if duplicate_open and not is_new_low:
+        # An alert for this route is already open, and price hasn't dropped
+        # further since — no need to notify again.
+        return None
 
     currency = route.get("currency", "TWD")
     new_low_badge = "🎯 " if is_new_low else ""
@@ -135,7 +137,7 @@ def open_issue_if_new(
         f"{suggestion}\n\n"
         f"關掉這個 issue 後，下次再跌破才會再開新的。"
     )
-    title = f"{new_low_badge}{title_prefix}: {route['name']} 跌到 {currency} {price:,.0f}"
+    title = f"{new_low_badge}{currency} {price:,.0f}｜{title_prefix}: {route['name']}"
     r = requests.post(
         f"https://api.github.com/repos/{repo}/issues",
         headers=headers,

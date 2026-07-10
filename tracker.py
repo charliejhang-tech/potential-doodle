@@ -16,6 +16,28 @@ CONFIG_PATH = Path("config.yml")
 HISTORY_PATH = Path("history.json")
 ALERT_LABEL = "flight-alert"
 WATCH_LABEL = "flight-watch"
+STRONG_BUY_LABEL = "flight-strong-buy"
+
+KIND_INFO = {
+    "strong_buy": {
+        "label": STRONG_BUY_LABEL,
+        "title_prefix": "🔥 強力買進",
+        "suggestion": "已經逼近或打破史上低點，這種價位很少見，建議別再等，直接下單。",
+        "threshold_field": "strong_buy_threshold",
+    },
+    "alert": {
+        "label": ALERT_LABEL,
+        "title_prefix": "票價警報",
+        "suggestion": "已跌破警報門檻，建議下單。",
+        "threshold_field": "threshold",
+    },
+    "watch": {
+        "label": WATCH_LABEL,
+        "title_prefix": "票價留意",
+        "suggestion": "進入觀察價位，建議開始留意。",
+        "threshold_field": "watch_threshold",
+    },
+}
 
 
 def search_flights(api_key: str, route: dict) -> dict:
@@ -93,9 +115,10 @@ def open_issue_if_new(
     is_new_low: bool,
 ) -> str | None:
     """Open an issue for the given alert kind, skipping if one of that kind is already open for this route."""
-    label = ALERT_LABEL if kind == "alert" else WATCH_LABEL
-    title_prefix = "票價警報" if kind == "alert" else "票價留意"
-    suggestion = "已跌破警報門檻，建議下單。" if kind == "alert" else "進入觀察價位，建議開始留意。"
+    info = KIND_INFO[kind]
+    label = info["label"]
+    title_prefix = info["title_prefix"]
+    suggestion = info["suggestion"]
 
     headers = {
         "Authorization": f"Bearer {token}",
@@ -117,9 +140,7 @@ def open_issue_if_new(
 
     currency = route.get("currency", "TWD")
     new_low_badge = "🎯 " if is_new_low else ""
-    threshold_field = (
-        route.get("threshold") if kind == "alert" else route.get("watch_threshold")
-    )
+    threshold_field = route.get(info["threshold_field"])
     body = (
         f"航線：**{route['name']}**\n\n"
         f"| 項目 | 內容 |\n"
@@ -192,10 +213,13 @@ def main() -> int:
         print(f"  lowest: {currency} {price:,.0f}{new_low_marker}", flush=True)
         append_history(history, name, price, currency)
 
+        strong_buy = route.get("strong_buy_threshold")
         threshold = route.get("threshold")
         watch = route.get("watch_threshold")
         kind: str | None = None
-        if threshold and price <= threshold:
+        if strong_buy and price <= strong_buy:
+            kind = "strong_buy"
+        elif threshold and price <= threshold:
             kind = "alert"
         elif watch and price <= watch:
             kind = "watch"

@@ -13,6 +13,7 @@
 #   airline       航空公司 IATA 代碼 (JX = 星宇)；要看所有航空就把這行刪掉或註解掉
 #   threshold     跌到這個價 (含稅總價) 以下就開「警報」issue (買!)
 #   watch_threshold 跌到這個價以下開「留意」issue (沒到 threshold 那麼急) (可省略)
+#   strong_buy_threshold 跌到這個價以下開「🔥 強力買進」issue (逼近/打破史上低點，別再等了) (可省略)
 
 routes:
   # 主追蹤：所有航空直飛裡的最便宜
@@ -26,6 +27,7 @@ routes:
     non_stop: true
     threshold: 11000          # 跌破就「警報」(BUY)
     watch_threshold: 12000    # 跌破就「留意」(heads up)
+    strong_buy_threshold: 9300  # 逼近史上低點 9,482(6/20)，跌破這裡別再等，直接下單
 
   # 同日期但只看星宇直飛 (JX 741/742 早班為主)
   # 目前約 $12,805；星宇本身比較少破萬，門檻設保守一點
@@ -40,3 +42,4 @@ routes:
     airline: JX
     threshold: 11500          # 星宇跌到 11500 算撿到便宜
     watch_threshold: 12500    # 跌到 12500 先留意
+    strong_buy_threshold: 9800  # 逼近史上低點 10,556(6/26)，跌破這裡別再等，直接下單

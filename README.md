@@ -2,6 +2,8 @@
 
 每天自動查 Google Flights 票價（透過 SerpAPI），跌破門檻就在 GitHub 開 issue（GitHub 會自動寄信給你）。所有歷史價格存在 `history.json`，可以畫線圖看趨勢。
 
+門檻分三級（由嚴重到輕微）：`strong_buy_threshold`（🔥 逼近/打破史上低點，別再等）→ `threshold`（警報，建議下單）→ `watch_threshold`（留意，還沒到買點但開始關注）。
+
 ## 一次性設定（約 5 分鐘）
 
 ### 1. 申請 SerpAPI key

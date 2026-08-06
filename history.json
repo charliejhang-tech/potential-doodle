@@ -706,5 +706,11 @@
     "checked_at": "2026-08-05T03:54:47+00:00",
     "price": 9887.0,
     "currency": "TWD"
+  },
+  {
+    "route": "TPE↔BKK 10/3-10/11 全航空",
+    "checked_at": "2026-08-06T04:06:59+00:00",
+    "price": 9398.0,
+    "currency": "TWD"
   }
 ]
